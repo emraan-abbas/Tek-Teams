@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const routes = require('./Routes/index');
+const dotenv = require('dotenv');
 
 const app = express();
 
@@ -14,6 +15,9 @@ app.use(bodyParser.json());
 
 // CORS
 app.use(cors());
+
+// DOT-ENV
+dotenv.config();
 
 // Database Connection
 mongoose.connect('mongodb://127.0.0.1:27017/tekteams', {
