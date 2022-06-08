@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const nodeMailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const User = require('../Models/user.model')
 
@@ -77,23 +77,24 @@ exports.login = async (req, res) => {
     if (user) {
       bcrypt.compare(req.body.password, user.password, async (err, result) => {
         try {
-          if (err) {
-            res.status(400).json({
-              message: 'Error at Bcrypt Compare',
-              err: err
-            })
-          }
-          else {
-            const token = await jwt.sign(
-              { email: result.email }, 'mySecretKey', { expiresIn: '1h' }
+          if (result) {
+            const token = jwt.sign(
+              { email: user.email, role: user.role }, 'mySecretKey', { expiresIn: '1h' }
             );
             return res.status(200).json({
               message: 'Login Successful !',
               token: token
             })
           }
+          else {
+            res.status(400).json({
+              message: 'Password Not Matched',
+              err: err
+            })
+          }
         }
         catch (error) {
+          console.log('ERROR AT SIGN IN (INNER FUNCTION', error)
           res.status(401).json({
             message: 'Error at Sign In (Inner Function) !',
             error: error
@@ -116,3 +117,65 @@ exports.login = async (req, res) => {
     });
   }
 };
+
+// Edit User
+exports.edit = async (req, res) => {
+  try {
+    if (!req.body) {
+      return res.status(400).json({
+        message: 'Fill the required fileds.'
+      })
+    }
+    else {
+      const update = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          name: req.body.name,
+          role: req.body.role,
+        }
+      );
+      if (update) {
+        return res.status(200).json({
+          message: 'Data Updated Successfully !'
+        })
+      }
+      else {
+        return res.status(400).json({
+          message: 'User Not Found !'
+        })
+      }
+    }
+  }
+  catch (error) {
+    console.log("ERROR AT EDIT USER = ", error)
+    return res.status(401).json({
+      message: 'Error at Edit User !',
+      error: error,
+    });
+  }
+};
+
+// Delete User
+exports.delete = async (req, res) => {
+  try {
+    if (await User.findByIdAndDelete(req.params.id)) {
+      return res.status(200).json({
+        message: 'User Deleted Successfully !'
+      })
+    }
+    else {
+      return res.status(200).json({
+        message: 'User Not Found !'
+      })
+    }
+  }
+  catch (error) {
+    console.log("ERROR AT DELETE USER = ", error)
+    return res.status(401).json({
+      message: 'Error at Delete User.',
+      error: error,
+    });
+  }
+};
+
+
