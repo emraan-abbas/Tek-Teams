@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const User = require('../Models/user.model')
 
@@ -113,6 +112,23 @@ exports.login = async (req, res) => {
     console.log("ERROR AT LOG IN = ", error)
     return res.status(401).json({
       message: 'Error at Log In !',
+      error: error,
+    });
+  }
+};
+
+// Get all USERS
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find()
+    return res.status(201).json({
+      message: 'All Users : ', users
+    });
+  }
+  catch (error) {
+    console.log("ERROR AT GET ALL USERS = ", error)
+    return res.status(401).json({
+      message: 'Error at Get All Users !',
       error: error,
     });
   }
