@@ -78,7 +78,7 @@ exports.login = async (req, res) => {
         try {
           if (result) {
             const token = jwt.sign(
-              { email: user.email, role: user.role }, 'mySecretKey', { expiresIn: '1h' }
+              { email: user.email, id: user.id }, 'mySecretKey', { expiresIn: '1h' }
             );
             return res.status(200).json({
               message: 'Login Successful !',
@@ -112,6 +112,32 @@ exports.login = async (req, res) => {
     console.log("ERROR AT LOG IN = ", error)
     return res.status(401).json({
       message: 'Error at Log In !',
+      error: error,
+    });
+  }
+};
+
+// Get a USER
+exports.getUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findById(id)
+    if (!user) {
+      return res.status(401).json({
+        message: `No user found.`
+      });
+    }
+    else {
+      return res.status(201).json({
+        message: `User with Id (${id}) = `, user
+      });
+    }
+
+  }
+  catch (error) {
+    console.log("ERROR AT GET A USER = ", error)
+    return res.status(401).json({
+      message: 'Error at Get A User !',
       error: error,
     });
   }
