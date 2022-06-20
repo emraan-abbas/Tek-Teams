@@ -7,8 +7,11 @@ exports.postMessage = async (req, res) => {
   try {
     let message = await new Chat({
       message: req.msg,
+      // message: req.body.msg,
       senderId: req.senderId,
+      // senderId: req.body.senderId,
       reciverId: req.reciverId
+      // reciverId: req.body.reciverId
     }).save()
 
     // return res.status(200).json({ data: message, message: 'Message Sent' });
@@ -52,7 +55,10 @@ exports.getMessage = async (req, res) => {
 // Get Message By ID
 exports.getMessageById = async (req, res) => {
   try {
-    let messageById = await Chat.find({ id: { $in: [senderId, reciverId] } });
+    let messageById = await Chat.find({
+      senderId: req.body.senderId,
+      reciverId: req.body.reciverId
+    });
     if (messageById) {
       return res.status(200).json({
         message: 'List of All Related Messages',
